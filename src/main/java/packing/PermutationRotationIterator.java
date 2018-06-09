@@ -34,8 +34,6 @@ public class PermutationRotationIterator {
 
     public static class PermutationRotation {
 
-        protected int count;
-
         protected Box[] boxes;
 
         public Box[] getBoxes() {
@@ -46,19 +44,12 @@ public class PermutationRotationIterator {
             this.boxes = boxes;
         }
 
-        public void setCount(int count) {
-            this.count = count;
-        }
-
-        public int getCount() {
-            return count;
-        }
     }
 
-    public static PermutationRotation[] toRotationMatrix(List<BoxItem> list, boolean rotate3D) {
+    public static PermutationRotation[] toRotationMatrix(List<Box> list, boolean rotate3D) {
         PermutationRotation[] boxes = new PermutationRotation[list.size()];
         for (int i = 0; i < list.size(); i++) {
-            Box box = list.get(i).getBox();
+            Box box = list.get(i);
 
             List<Box> result = new ArrayList<>();
             if (rotate3D) {
@@ -104,7 +95,6 @@ public class PermutationRotationIterator {
 
             boxes[i] = new PermutationRotation();
             boxes[i].setBoxes(result.toArray(new Box[result.size()]));
-            boxes[i].setCount(list.get(i).getCount());
         }
         return boxes;
     }
@@ -114,7 +104,7 @@ public class PermutationRotationIterator {
     private int[] rotations; // 2^n or 6^n
     private int[] permutations; // n!
 
-    public PermutationRotationIterator(List<BoxItem> list, Dimension bound, boolean rotate3D) {
+    public PermutationRotationIterator(List<Box> list, Dimension bound, boolean rotate3D) {
         this(bound, toRotationMatrix(list, rotate3D));
     }
 
@@ -136,11 +126,7 @@ public class PermutationRotationIterator {
             }
             matrix[i] = new PermutationRotation();
             matrix[i].setBoxes(result.toArray(new Box[result.size()]));
-            matrix[i].setCount(unconstrained[i].getCount());
-
-            for (int k = 0; k < unconstrained[i].count; k++) {
-                types.add(i);
-            }
+            types.add(i);
         }
 
         this.matrix = matrix;
@@ -201,55 +187,22 @@ public class PermutationRotationIterator {
     }
 
     public long countPermutations() {
-        // reduce permutations for boxes which are duplicated
-
         int maxCount = 0;
         for (int i = 0; i < matrix.length; i++) {
-            if (maxCount < matrix[i].getCount()) {
-                maxCount = matrix[i].getCount();
+            if (maxCount < 1) {
+                maxCount = 1;
             }
         }
 
         long n = 1;
-        if (maxCount > 1) {
-            int[] factors = new int[maxCount];
-            for (int i = 0; i < matrix.length; i++) {
-                for (int k = 0; k < matrix[i].getCount(); k++) {
-                    factors[k]++;
-                }
+
+        for (long i = 0; i < permutations.length; i++) {
+            if (Long.MAX_VALUE / (i + 1) <= n) {
+                return -1L;
             }
-
-            for (long i = 0; i < permutations.length; i++) {
-                if (Long.MAX_VALUE / (i + 1) <= n) {
-                    return -1L;
-                }
-
-                n = n * (i + 1);
-
-                for (int k = 1; k < maxCount; k++) {
-                    while (factors[k] > 0 && n % (k + 1) == 0) {
-                        n = n / (k + 1);
-
-                        factors[k]--;
-                    }
-                }
-            }
-
-            for (int k = 1; k < maxCount; k++) {
-                while (factors[k] > 0) {
-                    n = n / (k + 1);
-
-                    factors[k]--;
-                }
-            }
-        } else {
-            for (long i = 0; i < permutations.length; i++) {
-                if (Long.MAX_VALUE / (i + 1) <= n) {
-                    return -1L;
-                }
-                n = n * (i + 1);
-            }
+            n = n * (i + 1);
         }
+
         return n;
     }
 

@@ -54,25 +54,25 @@ public class Controller implements PropertyChangeListener {
                 BruteForcePackager packager = new BruteForcePackager(Collections.singletonList((Dimension) view.getContainerComboBox().getSelectedItem()), false, false);
                 long deadline = System.currentTimeMillis() + 10000;
 
-                List<BoxItem> products = new ArrayList<>();
-                products.add(new BoxItem(new Box("72407",20,30,15), 1));
-                products.add(new BoxItem(new Box("74809",100,120,52), 1));
-                products.add(new BoxItem(new Box("71535",30,40,15), 1));
-                products.add(new BoxItem(new Box("74780",20,30,15), 1));
-                products.add(new BoxItem(new Box("74760_1",30,20,15), 1));
-                products.add(new BoxItem(new Box("74760_2",30,20,15), 1));
-                products.add(new BoxItem(new Box("74757",30,40,15), 1));
-                products.add(new BoxItem(new Box("74808",100,120,75), 1));
-                products.add(new BoxItem(new Box("73770",20,30,15), 1));
-                products.add(new BoxItem(new Box("74844_1",60,40,28), 1));
-                products.add(new BoxItem(new Box("74844_2",60,40,28), 1));
-                products.add(new BoxItem(new Box("74844_3",60,40,28), 1));
-                products.add(new BoxItem(new Box("74846",30,40,15), 1));
-                products.add(new BoxItem(new Box("73767_1",60,50,15), 1));
-                products.add(new BoxItem(new Box("73767_2",60,50,15), 1));
-                products.add(new BoxItem(new Box("74848",20,30,15), 1));
-                products.add(new BoxItem(new Box("74850",20,30,15), 1));
-                products.add(new BoxItem(new Box("74852",20,30,15), 1));
+                List<Box> products = new ArrayList<>();
+                products.add(new Box("72407",20,30,15));
+                products.add(new Box("74809",100,120,52));
+                products.add(new Box("71535",30,40,15));
+                products.add(new Box("74780",20,30,15));
+                products.add(new Box("74760_1",30,20,15));
+                products.add(new Box("74760_2",30,20,15));
+                products.add(new Box("74757",30,40,15));
+                products.add(new Box("74808",100,120,75));
+                products.add(new Box("73770",20,30,15));
+                products.add(new Box("74844_1",60,40,28));
+                products.add(new Box("74844_2",60,40,28));
+                products.add(new Box("74844_3",60,40,28));
+                products.add(new Box("74846",30,40,15));
+                products.add(new Box("73767_1",60,50,15));
+                products.add(new Box("73767_2",60,50,15));
+                products.add(new Box("74848",20,30,15));
+                products.add(new Box("74850",20,30,15));
+                products.add(new Box("74852",20,30,15));
 
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Json files", "json");
 

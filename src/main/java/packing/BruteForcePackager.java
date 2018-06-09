@@ -27,7 +27,7 @@ public class BruteForcePackager {
      */
 
     public interface Adapter {
-        Container pack(List<BoxItem> boxes, Dimension dimension, long deadline);
+        Container pack(List<Box> boxes, Dimension dimension, long deadline);
     }
 
 
@@ -55,10 +55,10 @@ public class BruteForcePackager {
         return pack(placements, dimension, rotator, deadline);
     }
 
-    public List<Dimension> filterContainers(List<BoxItem> boxes) {
+    public List<Dimension> filterContainers(List<Box> boxes) {
         long volume = 0;
-        for (BoxItem box : boxes) {
-            volume += box.getBox().getVolume() * box.getCount();
+        for (Box box : boxes) {
+            volume += box.getVolume();
         }
 
         List<Dimension> list = new ArrayList<>();
@@ -85,7 +85,7 @@ public class BruteForcePackager {
      * @return index of container if match, -1 if not
      */
 
-    public Container pack(List<BoxItem> boxes, long deadline) {
+    public Container pack(List<Box> boxes, long deadline) {
         return pack(boxes, filterContainers(boxes), deadline);
     }
 
@@ -276,7 +276,7 @@ public class BruteForcePackager {
         return false;
     }
 
-    protected Adapter adapter(List<BoxItem> boxes) {
+    protected Adapter adapter(List<Box> boxes) {
         // instead of placing boxes, work with placements
         // this very much reduces the number of objects created
         // performance gain is something like 25% over the box-centric approach
@@ -285,27 +285,27 @@ public class BruteForcePackager {
 
         int count = 0;
         for (PermutationRotationIterator.PermutationRotation permutationRotation : rotations) {
-            count += permutationRotation.getCount();
+            count++;
         }
 
         final List<Placement> placements = getPlacements(count);
 
         return new Adapter() {
             @Override
-            public Container pack(List<BoxItem> boxes, Dimension dimension, long deadline) {
+            public Container pack(List<Box> boxes, Dimension dimension, long deadline) {
                 return BruteForcePackager.this.pack(placements, dimension, rotations, deadline);
             }
         };
     }
 
-    protected boolean canHold(Dimension containerBox, List<BoxItem> boxes) {
-        for (BoxItem box : boxes) {
+    protected boolean canHold(Dimension containerBox, List<Box> boxes) {
+        for (Box box : boxes) {
             if (rotate3D) {
-                if (!containerBox.canHold3D(box.getBox())) {
+                if (!containerBox.canHold3D(box)) {
                     return false;
                 }
             } else {
-                if (!containerBox.canHold2D(box.getBox())) {
+                if (!containerBox.canHold2D(box)) {
                     return false;
                 }
             }
@@ -328,7 +328,7 @@ public class BruteForcePackager {
         return placements;
     }
 
-    public Container pack(List<BoxItem> boxes, List<Dimension> dimensions, long deadline) {
+    public Container pack(List<Box> boxes, List<Dimension> dimensions, long deadline) {
         if (dimensions.isEmpty()) {
             return null;
         }
