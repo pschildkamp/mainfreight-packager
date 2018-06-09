@@ -68,10 +68,6 @@ public class PermutationRotationIterator {
     private int[] rotations; // 2^n or 6^n
     private int[] permutations; // n!
 
-    public PermutationRotationIterator(List<Box> list, Dimension bound) {
-        this(bound, toRotationMatrix(list));
-    }
-
     public PermutationRotationIterator(Dimension bound, PermutationRotation[] unconstrained) {
         List<Integer> types = new ArrayList<>(unconstrained.length * 2);
 

@@ -23,27 +23,4 @@ public class Level extends ArrayList<Placement> {
 
         return height;
     }
-
-    /**
-     * 
-     * Check whether placement is valid, i.e. no overlaps.
-     * 
-     */
-
-    public void validate() {
-        for (int i = 0; i < size(); i++) {
-            for (int j = 0; j < size(); j++) {
-                if (j == i) {
-                    if (!get(i).intercets(get(j))) {
-                        throw new IllegalArgumentException();
-                    }
-                } else {
-                    if (get(i).intercets(get(j))) {
-                        throw new IllegalArgumentException(i + " vs " + j);
-                    }
-                }
-            }
-        }
-    }
-
 }

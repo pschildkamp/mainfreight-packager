@@ -12,14 +12,6 @@ public class Container extends Box {
         super(dimension.getName(), dimension.getWidth(), dimension.getDepth(), dimension.getHeight());
     }
 
-    public Container(int w, int d, int h) {
-        super(w, d, h);
-    }
-
-    public Container(String name, int w, int d, int h) {
-        super(name, w, d, h);
-    }
-
     public boolean add(Level element) {
         if (!levels.isEmpty()) {
             stackHeight += currentLevelStackHeight();
@@ -30,14 +22,6 @@ public class Container extends Box {
 
     public int getStackHeight() {
         return stackHeight + currentLevelStackHeight();
-    }
-
-    public void add(int index, Level element) {
-        if (!levels.isEmpty()) {
-            stackHeight += currentLevelStackHeight();
-        }
-
-        levels.add(index, element);
     }
 
     public int currentLevelStackHeight() {
@@ -63,29 +47,9 @@ public class Container extends Box {
         return new Dimension(width, depth, spaceHeight);
     }
 
-    public List<Level> getLevels() {
-        return levels;
-    }
-
-    public Placement get(int level, int placement) {
-        return levels.get(level).get(placement);
-    }
-
-    public void validateCurrentLevel() {
-        levels.get(levels.size() - 1).validate();
-    }
-
     public void clear() {
         levels.clear();
         stackHeight = 0;
-    }
-
-    public int getBoxCount() {
-        int count = 0;
-        for (Level level : levels) {
-            count += level.size();
-        }
-        return count;
     }
 
     @Override

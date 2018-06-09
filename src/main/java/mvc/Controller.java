@@ -9,14 +9,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.jar.Pack200;
 
 
 import javax.swing.*;
@@ -51,7 +48,7 @@ public class Controller implements PropertyChangeListener {
                 if (model.getBoxes().getRowCount() < 1)
                     throw new RuntimeException("Je moet minimaal 1 doos toevoegen");
 
-                BruteForcePackager packager = new BruteForcePackager(Collections.singletonList((Dimension) view.getContainerComboBox().getSelectedItem()));
+                Packager packager = new Packager((Dimension) view.getContainerComboBox().getSelectedItem());
                 long deadline = System.currentTimeMillis() + 10000;
 
                 List<Box> products = new ArrayList<>();

@@ -38,8 +38,6 @@ public class Model {
         }
     };
 
-    private TableColumnModel tableColumnModel = new DefaultTableColumnModel();
-
     static {
         AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vliegtuig", 1355, 285, 247));
 
@@ -70,9 +68,5 @@ public class Model {
 
     public DefaultTableModel getBoxes() {
         return boxes;
-    }
-
-    public TableColumnModel getTableColumnModel() {
-        return tableColumnModel;
     }
 }
