@@ -46,51 +46,15 @@ public class PermutationRotationIterator {
 
     }
 
-    public static PermutationRotation[] toRotationMatrix(List<Box> list, boolean rotate3D) {
+    public static PermutationRotation[] toRotationMatrix(List<Box> list) {
         PermutationRotation[] boxes = new PermutationRotation[list.size()];
         for (int i = 0; i < list.size(); i++) {
             Box box = list.get(i);
 
             List<Box> result = new ArrayList<>();
-            if (rotate3D) {
-                Box box0 = box.clone();
-                boolean square0 = box.isSquare2D();
-
-                result.add(box0);
-
-                if (!box.isSquare3D()) {
-
-                    box.rotate3D();
-                    boolean square1 = box.isSquare2D();
-
-                    result.add(box.clone());
-
-                    box.rotate3D();
-                    boolean square2 = box.isSquare2D();
-
-                    result.add(box.clone());
-
-                    if (!square0 && !square1 && !square2) {
-                        box.rotate2D3D();
-
-                        result.add(box.clone());
-
-                        box.rotate3D();
-
-                        result.add(box.clone());
-
-                        box.rotate3D();
-
-                        result.add(box.clone());
-                    }
-                }
-            } else {
-                result.add(box.clone());
-
-                // do not rotate 2d if square
-                if (!box.isSquare2D()) {
-                    result.add(box.clone().rotate2D());
-                }
+            result.add(box.clone());
+            if (!box.isSquare2D()) {
+                result.add(box.clone().rotate2D());
             }
 
             boxes[i] = new PermutationRotation();
@@ -104,8 +68,8 @@ public class PermutationRotationIterator {
     private int[] rotations; // 2^n or 6^n
     private int[] permutations; // n!
 
-    public PermutationRotationIterator(List<Box> list, Dimension bound, boolean rotate3D) {
-        this(bound, toRotationMatrix(list, rotate3D));
+    public PermutationRotationIterator(List<Box> list, Dimension bound) {
+        this(bound, toRotationMatrix(list));
     }
 
     public PermutationRotationIterator(Dimension bound, PermutationRotation[] unconstrained) {

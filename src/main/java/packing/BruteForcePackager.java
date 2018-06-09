@@ -17,8 +17,6 @@ import java.util.List;
 public class BruteForcePackager {
 
     protected final Dimension[] containers;
-
-    protected final boolean rotate3D; // if false, then 2d
     protected final boolean binarySearch;
 
     /**
@@ -42,10 +40,9 @@ public class BruteForcePackager {
      *            if true, the packager attempts to find the best box given a binary search. Upon finding a container that
      *            can hold the boxes, given time, it also tries to find a better match.
      */
-    public BruteForcePackager(List<? extends Dimension> containers, boolean rotate3D, boolean binarySearch) {
+    public BruteForcePackager(List<? extends Dimension> containers) {
         this.containers = containers.toArray(new Dimension[containers.size()]);
-        this.rotate3D = rotate3D;
-        this.binarySearch = binarySearch;
+        this.binarySearch = false;
     }
 
     protected Container pack(List<Placement> placements, Dimension dimension, PermutationRotationIterator.PermutationRotation[] rotations, long deadline) {
@@ -281,7 +278,7 @@ public class BruteForcePackager {
         // this very much reduces the number of objects created
         // performance gain is something like 25% over the box-centric approach
 
-        final PermutationRotationIterator.PermutationRotation[] rotations = PermutationRotationIterator.toRotationMatrix(boxes, rotate3D);
+        final PermutationRotationIterator.PermutationRotation[] rotations = PermutationRotationIterator.toRotationMatrix(boxes);
 
         int count = 0;
         for (PermutationRotationIterator.PermutationRotation permutationRotation : rotations) {
@@ -300,14 +297,8 @@ public class BruteForcePackager {
 
     protected boolean canHold(Dimension containerBox, List<Box> boxes) {
         for (Box box : boxes) {
-            if (rotate3D) {
-                if (!containerBox.canHold3D(box)) {
-                    return false;
-                }
-            } else {
-                if (!containerBox.canHold2D(box)) {
-                    return false;
-                }
+            if (!containerBox.canHold2D(box)) {
+                return false;
             }
         }
         return true;

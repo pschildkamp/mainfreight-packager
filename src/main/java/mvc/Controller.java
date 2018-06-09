@@ -51,7 +51,7 @@ public class Controller implements PropertyChangeListener {
                 if (model.getBoxes().getRowCount() < 1)
                     throw new RuntimeException("Je moet minimaal 1 doos toevoegen");
 
-                BruteForcePackager packager = new BruteForcePackager(Collections.singletonList((Dimension) view.getContainerComboBox().getSelectedItem()), false, false);
+                BruteForcePackager packager = new BruteForcePackager(Collections.singletonList((Dimension) view.getContainerComboBox().getSelectedItem()));
                 long deadline = System.currentTimeMillis() + 10000;
 
                 List<Box> products = new ArrayList<>();
