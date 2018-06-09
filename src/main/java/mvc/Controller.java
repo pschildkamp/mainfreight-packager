@@ -49,7 +49,7 @@ public class Controller implements PropertyChangeListener {
                     throw new RuntimeException("Je moet minimaal 1 doos toevoegen");
 
                 Packager packager = new Packager((Dimension) view.getContainerComboBox().getSelectedItem());
-                long deadline = System.currentTimeMillis() + 10000;
+                long deadline = System.currentTimeMillis() + 1000000;
 
                 List<Box> products = new ArrayList<>();
                 products.add(new Box("72407",20,30,15));
@@ -80,20 +80,21 @@ public class Controller implements PropertyChangeListener {
                     File file = fileChooser.getSelectedFile();
 
                     Container match = packager.pack(products, deadline);
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
-                    Gson gson = gsonBuilder.create();
-                    Type type = new TypeToken<Container>() {}.getType();
-
-                    try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-                        writer.write(gson.toJson(match, type));
-                    }
-
-                    if(match == null)
+                    if(match == null) {
                         JOptionPane.showMessageDialog(view.getFrame(),
                                 "Geen doos pas in deze container",
                                 "Error",
                                 JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
+                        Gson gson = gsonBuilder.create();
+                        Type type = new TypeToken<Container>() {}.getType();
+
+                        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
+                            writer.write(gson.toJson(match, type));
+                        }
+                    }
                 }
             } catch(RuntimeException ex) {
                 JOptionPane.showMessageDialog(view.getFrame(),

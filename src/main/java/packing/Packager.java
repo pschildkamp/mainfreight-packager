@@ -1,22 +1,23 @@
 package packing;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.collections4.iterators.PermutationIterator;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Fit boxes into container, i.e. perform bin packing to a single container. <br>
  * <br>
  * This attempts a brute force approach, which is very demanding in terms of resources. For use in scenarios with 'few'
  * boxes, where the complexity of a 'few' can be measured for a specific set of boxes and containers using
- * {@linkplain PermutationRotationIterator#countPermutations()} *
- * {@linkplain PermutationRotationIterator#countRotations()}. <br>
  * <br>
  * Thread-safe implementation.
  */
 
 public class Packager {
 
-    protected final Dimension container;
+    private final Dimension container;
+
 
     /**
      * Logical packager for wrapping preprocessing / optimizations.
@@ -31,12 +32,6 @@ public class Packager {
         this.container = container;
     }
 
-    protected Container pack(List<Placement> placements, Dimension dimension, PermutationRotationIterator.PermutationRotation[] rotations, long deadline) {
-
-        PermutationRotationIterator rotator = new PermutationRotationIterator(dimension, rotations);
-
-        return pack(placements, dimension, rotator, deadline);
-    }
 
     public Dimension filterContainer(List<Box> boxes) {
         long volume = 0;
@@ -66,7 +61,7 @@ public class Packager {
         return pack(boxes, filterContainer(boxes), deadline);
     }
 
-    public Container pack(List<Placement> placements, Dimension container, PermutationRotationIterator rotator, long deadline) {
+    public Container pack(List<Placement> placements, Dimension container, PermutationBoxIterator rotator, long deadline) {
 
         Container holder = new Container(container);
 
@@ -76,12 +71,11 @@ public class Packager {
                 break;
             }
             // iterator over all rotations
-
-            fit: do {
+            for (Box box : rotator.next()) {
                 Dimension remainingSpace = container;
 
                 int index = 0;
-                while (index < rotator.length()) {
+                while (index < rotator.getLength()) {
                     if (System.currentTimeMillis() > deadline) {
                         // fit2d below might have returned due to deadline
                         return null;
@@ -90,11 +84,8 @@ public class Packager {
                     if (!rotator.isWithinHeight(index, remainingSpace.getHeight())) {
                         // clean up
                         holder.clear();
-
-                        continue fit;
+                        continue;
                     }
-
-                    Box box = rotator.get(index);
 
                     Placement placement = placements.get(index);
                     Space levelSpace = placement.getSpace();
@@ -122,18 +113,18 @@ public class Packager {
                 }
 
                 return holder;
-            } while (rotator.nextRotation());
-        } while (rotator.nextPermutation());
+            };
+        } while (rotator.hasNext());
 
         return null;
     }
 
-    protected int fit2D(PermutationRotationIterator rotator, int index, List<Placement> placements, Container holder, Placement usedSpace, long deadline) {
+    protected int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Container holder, Placement usedSpace, long deadline) {
         // add used space box now
         // there is up to possible 2 free spaces
         holder.add(usedSpace);
 
-        if (index >= rotator.length()) {
+        if (index >= rotator.getLength()) {
             return index;
         }
 
@@ -158,7 +149,7 @@ public class Packager {
         // attempt to fit in the remaining (usually smaller) space first
 
         // stack in the 'sibling' space - the space left over between the used box and the selected free space
-        if (index < rotator.length()) {
+        if (index < rotator.getLength()) {
             Space remainder = nextPlacement.getSpace().getRemainder();
             if (!remainder.isEmpty()) {
                 Box box = rotator.get(index);
@@ -253,18 +244,19 @@ public class Packager {
         return false;
     }
 
+
     protected Adapter adapter(List<Box> boxes) {
         // instead of placing boxes, work with placements
         // this very much reduces the number of objects created
         // performance gain is something like 25% over the box-centric approach
 
-        final PermutationRotationIterator.PermutationRotation[] rotations = PermutationRotationIterator.toRotationMatrix(boxes);
-        final List<Placement> placements = getPlacements(rotations.length);
+        PermutationBoxIterator permutationIterator = new PermutationBoxIterator(boxes);
+        final List<Placement> placements = getPlacements(permutationIterator.getLength());
 
         return new Adapter() {
             @Override
             public Container pack(List<Box> boxes, Dimension dimension, long deadline) {
-                return Packager.this.pack(placements, dimension, rotations, deadline);
+                return Packager.this.pack(placements, dimension, permutationIterator, deadline);
             }
         };
     }
@@ -308,4 +300,95 @@ public class Packager {
         return null;
     }
 
+    public class PermutationBoxIterator implements Iterator<List<Box>>  {
+        private int[] keys;
+        private Map<Integer, Box> objectMap;
+        private boolean[] direction;
+        private List<Box> nextPermutation;
+        int permutationLength = 1;
+
+        public int getLength() {
+           return permutationLength;
+        }
+
+        public boolean isWithinHeight(int fromIndex, int height) {
+            for (int i = (fromIndex + 1); i < getLength(); i++) {
+                if (objectMap.get(i).getHeight() > height) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public Box get(Integer index) {
+            return this.objectMap.get(index);
+        }
+
+        public PermutationBoxIterator(Collection<Box> coll) {
+            if (coll == null) {
+                throw new NullPointerException("The collection must not be null");
+            } else {
+                this.keys = new int[coll.size()];
+                this.direction = new boolean[coll.size()];
+                Arrays.fill(this.direction, false);
+
+                this.objectMap = new HashMap();
+
+                for(Iterator it = coll.iterator(); it.hasNext(); this.keys[permutationLength - 1] = permutationLength++) {
+                    Box e = (Box) it.next();
+                    this.objectMap.put(permutationLength, e);
+                }
+
+                this.nextPermutation = new ArrayList(coll);
+            }
+        }
+
+        public boolean hasNext() {
+            return this.nextPermutation != null;
+        }
+
+        public List<Box> next() {
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            } else {
+                int indexOfLargestMobileInteger = -1;
+                int largestKey = -1;
+
+                int offset;
+                for(offset = 0; offset < this.keys.length; ++offset) {
+                    if ((this.direction[offset] && offset < this.keys.length - 1 && this.keys[offset] > this.keys[offset + 1] || !this.direction[offset] && offset > 0 && this.keys[offset] > this.keys[offset - 1]) && this.keys[offset] > largestKey) {
+                        largestKey = this.keys[offset];
+                        indexOfLargestMobileInteger = offset;
+                    }
+                }
+
+                if (largestKey == -1) {
+                    List<Box> toReturn = this.nextPermutation;
+                    this.nextPermutation = null;
+                    return toReturn;
+                } else {
+                    offset = this.direction[indexOfLargestMobileInteger] ? 1 : -1;
+                    int tmpKey = this.keys[indexOfLargestMobileInteger];
+                    this.keys[indexOfLargestMobileInteger] = this.keys[indexOfLargestMobileInteger + offset];
+                    this.keys[indexOfLargestMobileInteger + offset] = tmpKey;
+                    boolean tmpDirection = this.direction[indexOfLargestMobileInteger];
+                    this.direction[indexOfLargestMobileInteger] = this.direction[indexOfLargestMobileInteger + offset];
+                    this.direction[indexOfLargestMobileInteger + offset] = tmpDirection;
+                    List<Box> nextP = new ArrayList();
+
+                    for(int i = 0; i < this.keys.length; ++i) {
+                        if (this.keys[i] > largestKey) {
+                            this.direction[i] = !this.direction[i];
+                        }
+
+                        nextP.add(this.objectMap.get(this.keys[i]));
+                    }
+
+                    List<Box> result = this.nextPermutation;
+                    this.nextPermutation = nextP;
+                    return result;
+                }
+            }
+        }
+    }
 }

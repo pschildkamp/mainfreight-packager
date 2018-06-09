@@ -65,10 +65,6 @@ public class Dimension {
         return (w <= width && d <= depth) || (d <= width && w <= depth);
     }
 
-    public boolean isSquare2D() {
-        return width == depth;
-    }
-
     /**
      * Check whether this object fits within a dimension (without rotation).
      * 
