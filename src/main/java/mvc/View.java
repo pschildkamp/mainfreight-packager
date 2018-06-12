@@ -13,8 +13,11 @@ public class View {
     private JComboBox containerComboBox;
     private JComboBox timeOutComboBox;
     private JButton addRowButton;
+    private JButton removeRowButton;
     private JButton packButton;
     private JTable boxesTable;
+    private JLabel permutationBoxIteratorCounter;
+    private JLabel timeoutCounter;
 
     public View() {
         frame = new JFrame("Mainfreight - Packing optimalisator");
@@ -34,7 +37,6 @@ public class View {
         GridLayout gridLayout = new GridLayout(1, 2, 0, 0);
         grid.setLayout(gridLayout);
 
-
         /* add container selection at left column */
         grid.add(getPackerPanel());
 
@@ -44,6 +46,10 @@ public class View {
         mainPanel.add(grid);
 
         frame.add(mainPanel);
+    }
+
+    public JLabel getTimeoutCounter() {
+        return timeoutCounter;
     }
 
     private JPanel getPackerPanel() {
@@ -75,6 +81,16 @@ public class View {
 
         packingOptionsPanel.add(packButton);
 
+        packingOptionsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        permutationBoxIteratorCounter = new JLabel("Doos posities geprobeerd: 0");
+        packingOptionsPanel.add(permutationBoxIteratorCounter);
+
+        packingOptionsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        timeoutCounter = new JLabel("Resterende tijd: 00:00");
+        packingOptionsPanel.add(timeoutCounter);
+
         return packingOptionsPanel;
     }
 
@@ -83,7 +99,7 @@ public class View {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setSize(new Dimension(780, 9));
 
-        ImageIcon mainFreightLogo = new ImageIcon("modules/ontwerpen_en_programmeren/exam/resources/mainfreight-logo.png");
+        ImageIcon mainFreightLogo = new ImageIcon(getClass().getResource("/mainfreight-logo.png").getPath());
         JLabel label = new JLabel(mainFreightLogo);
         label.setPreferredSize(new Dimension(780, 30));
         panel.add(label);
@@ -100,6 +116,12 @@ public class View {
         addRowButton.setActionCommand("addBox");
         addRowButton.setToolTipText("Voeg nieuwe doos toe");
 
+        removeRowButton = new JButton("Verwijder geselecteerde doos");
+        removeRowButton.setVerticalTextPosition(SwingConstants.CENTER);
+        removeRowButton.setActionCommand("removeBox");
+        removeRowButton.setToolTipText("Verwijder geselecteerde doos");
+        removeRowButton.setPreferredSize(new Dimension(380, 20));
+
         JLabel boxesLabel = new JLabel("Te berekenen pakketten");
         boxesLabel.setLabelFor(boxesTable);
 
@@ -115,10 +137,24 @@ public class View {
         listPane.add(listScroller);
         listPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
+//        JPanel boxActionPanel = new JPanel(new ());
+//       boxActionPanel.setLayout(new BoxLayout(boxActionPanel, BoxLayout.LINE_AXIS));
+        listPane.add(removeRowButton);
         listPane.add(addRowButton);
+
+//        listPane.add(boxActionPanel);
         listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         return listPane;
+    }
+
+    public void repaint() {
+        this.frame.repaint();
+    }
+
+
+    public JLabel getPermutationBoxIteratorCounter() {
+        return permutationBoxIteratorCounter;
     }
 
     public JComboBox getContainerComboBox() {
@@ -135,6 +171,10 @@ public class View {
 
     public JButton getAddBoxBtn() {
         return addRowButton;
+    }
+
+    public JButton getRemoveBoxBtn() {
+        return removeRowButton;
     }
 
     public JButton getPackBtn() {

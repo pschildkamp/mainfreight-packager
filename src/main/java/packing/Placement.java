@@ -26,10 +26,4 @@ public class Placement {
     public void setBox(Box box) {
         this.box = box;
     }
-
-    @Override
-    public String toString() {
-        return "Placement [" + space.getX() + "x" + space.getY() + "x" + space.getZ() + ", width=" + box.getWidth() + ", depth=" + box.getDepth() + ", height="
-                + box.getHeight() + "]";
-    }
 }

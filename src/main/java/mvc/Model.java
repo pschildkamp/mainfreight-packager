@@ -4,9 +4,7 @@ import packing.Dimension;
 
 import javax.swing.*;
 import javax.swing.event.SwingPropertyChangeSupport;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 
 import java.beans.PropertyChangeListener;
 
@@ -48,6 +46,8 @@ public class Model {
         TIME_OUTS.addElement(120);
         TIME_OUTS.addElement(180);
         TIME_OUTS.addElement(360);
+        TIME_OUTS.addElement(360);
+        TIME_OUTS.addElement(600);
     }
 
     public Model() {

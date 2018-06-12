@@ -38,11 +38,6 @@ public class Space extends Dimension {
     }
 
     @Override
-    public String toString() {
-        return "Space [name=" + name + ", " + x + "x" + y + "x" + z + ", width=" + width + ", depth=" + depth + ", height=" + height + "]";
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -83,7 +78,6 @@ public class Space extends Dimension {
     }
 
     public void copyFrom(Space space) {
-
         parent = space.parent;
         x = space.x;
         y = space.y;
@@ -99,9 +93,9 @@ public class Space extends Dimension {
         this.y = y;
         this.z = z;
 
-        width = w;
-        depth = d;
-        height = h;
+        this.width = w;
+        this.depth = d;
+        this.height = h;
     }
 
 }

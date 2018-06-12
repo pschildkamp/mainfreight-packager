@@ -6,6 +6,11 @@ import java.util.List;
 public class Container extends Box {
 
     private int stackHeight = 0;
+
+    public List<Level> getLevels() {
+        return levels;
+    }
+
     private List<Level> levels = new ArrayList<>();
 
     public Container(Dimension dimension) {

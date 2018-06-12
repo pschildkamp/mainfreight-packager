@@ -1,9 +1,6 @@
 package packing;
 
-import org.apache.commons.collections4.iterators.PermutationIterator;
-
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Fit boxes into container, i.e. perform bin packing to a single container. <br>
@@ -39,8 +36,12 @@ public class Packager {
             volume += box.getVolume();
         }
 
-        if (container.getVolume() < volume || !canHold(container, boxes)) {
-            return null;
+        if (container.getVolume() < volume) {
+            throw new ContainerTooSmallException("Container (volume: "+ container.getVolume()+ " is te klein voor al deze dozen (totaal volume: " + volume + ")");
+        }
+
+        if(!canHold(container, boxes)) {
+            throw new ContainerTooSmallException("Container is te klein voor ingevoerde (enkele) dozen.");
         }
 
         return container;
@@ -68,6 +69,7 @@ public class Packager {
         // iterator over all permutations
         do {
             if (System.currentTimeMillis() > deadline) {
+                System.out.println("Reached deadline... breaking.");
                 break;
             }
             // iterator over all rotations
@@ -113,7 +115,7 @@ public class Packager {
                 }
 
                 return holder;
-            };
+            }
         } while (rotator.hasNext());
 
         return null;
@@ -300,7 +302,7 @@ public class Packager {
         return null;
     }
 
-    public class PermutationBoxIterator implements Iterator<List<Box>>  {
+    private class PermutationBoxIterator implements Iterator<List<Box>>  {
         private int[] keys;
         private Map<Integer, Box> objectMap;
         private boolean[] direction;
