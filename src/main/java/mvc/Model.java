@@ -7,6 +7,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.table.DefaultTableModel;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 public class Model {
 
@@ -37,15 +38,14 @@ public class Model {
     };
 
     static {
-        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vliegtuig", 1355, 285, 247));
+        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Bestelbus", 2000, 4500, 1900));
+        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vrachtwagen 1tue", 2450, 6000, 2590));
+        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vrachtwagen 2tue", 2450, 12000, 2590));
 
-        TIME_OUTS.addElement(5);
-        TIME_OUTS.addElement(10);
         TIME_OUTS.addElement(30);
         TIME_OUTS.addElement(60);
         TIME_OUTS.addElement(120);
         TIME_OUTS.addElement(180);
-        TIME_OUTS.addElement(360);
         TIME_OUTS.addElement(360);
         TIME_OUTS.addElement(600);
     }

@@ -17,7 +17,6 @@ public class View {
     private JButton packButton;
     private JTable boxesTable;
     private JLabel permutationBoxIteratorCounter;
-    private JLabel timeoutCounter;
 
     public View() {
         frame = new JFrame("Mainfreight - Packing optimalisator");
@@ -46,10 +45,6 @@ public class View {
         mainPanel.add(grid);
 
         frame.add(mainPanel);
-    }
-
-    public JLabel getTimeoutCounter() {
-        return timeoutCounter;
     }
 
     private JPanel getPackerPanel() {
@@ -88,9 +83,6 @@ public class View {
 
         packingOptionsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        timeoutCounter = new JLabel("Resterende tijd: 00:00");
-        packingOptionsPanel.add(timeoutCounter);
-
         return packingOptionsPanel;
     }
 
@@ -110,6 +102,7 @@ public class View {
 
     private JPanel getBoxesPanel() {
         boxesTable = new JTable(null, null, null);
+        boxesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         addRowButton = new JButton("Voeg nieuwe doos toe");
         addRowButton.setVerticalTextPosition(SwingConstants.CENTER);
@@ -146,15 +139,6 @@ public class View {
         listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         return listPane;
-    }
-
-    public void repaint() {
-        this.frame.repaint();
-    }
-
-
-    public JLabel getPermutationBoxIteratorCounter() {
-        return permutationBoxIteratorCounter;
     }
 
     public JComboBox getContainerComboBox() {

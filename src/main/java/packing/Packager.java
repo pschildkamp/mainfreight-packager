@@ -14,21 +14,9 @@ import java.util.*;
 public class Packager {
 
     private final Dimension container;
-
-
-    /**
-     * Logical packager for wrapping preprocessing / optimizations.
-     *
-     */
-
-    public interface Adapter {
-        Container pack(List<Box> boxes, Dimension dimension, long deadline);
-    }
-
     public Packager(Dimension container ) {
         this.container = container;
     }
-
 
     public Dimension filterContainer(List<Box> boxes) {
         long volume = 0;
@@ -53,36 +41,25 @@ public class Packager {
      *
      * @param boxes
      *            list of boxes to fit in a container
-     * @param deadline
-     *            the system time in millis at which the search should be aborted
      * @return index of container if match, -1 if not
      */
 
-    public Container pack(List<Box> boxes, long deadline) {
-        return pack(boxes, filterContainer(boxes), deadline);
+    public Container pack(List<Box> boxes) {
+        return pack(boxes, filterContainer(boxes));
     }
 
-    public Container pack(List<Placement> placements, Dimension container, PermutationBoxIterator rotator, long deadline) {
+    public Container pack(List<Placement> placements, Dimension container, PermutationBoxIterator rotator) {
 
         Container holder = new Container(container);
 
         // iterator over all permutations
         do {
-            if (System.currentTimeMillis() > deadline) {
-                System.out.println("Reached deadline... breaking.");
-                break;
-            }
             // iterator over all rotations
             for (Box box : rotator.next()) {
                 Dimension remainingSpace = container;
 
                 int index = 0;
                 while (index < rotator.getLength()) {
-                    if (System.currentTimeMillis() > deadline) {
-                        // fit2d below might have returned due to deadline
-                        return null;
-                    }
-
                     if (!rotator.isWithinHeight(index, remainingSpace.getHeight())) {
                         // clean up
                         holder.clear();
@@ -108,7 +85,7 @@ public class Packager {
 
                     index++;
 
-                    index = fit2D(rotator, index, placements, holder, placement, deadline);
+                    index = fit2D(rotator, index, placements, holder, placement);
 
                     // update remaining space
                     remainingSpace = holder.getFreeSpace();
@@ -121,16 +98,12 @@ public class Packager {
         return null;
     }
 
-    protected int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Container holder, Placement usedSpace, long deadline) {
+    protected int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Container holder, Placement usedSpace) {
         // add used space box now
         // there is up to possible 2 free spaces
         holder.add(usedSpace);
 
         if (index >= rotator.getLength()) {
-            return index;
-        }
-
-        if (System.currentTimeMillis() > deadline) {
             return index;
         }
 
@@ -166,17 +139,16 @@ public class Packager {
                     placement.getSpace().setParent(remainder);
                     placement.getSpace().getRemainder().setParent(remainder);
 
-                    index = fit2D(rotator, index, placements, holder, placement, deadline);
+                    index = fit2D(rotator, index, placements, holder, placement);
                 }
             }
         }
 
         // fit the next box in the selected free space
-        return fit2D(rotator, index, placements, holder, nextPlacement, deadline);
+        return fit2D(rotator, index, placements, holder, nextPlacement);
     }
 
     protected boolean isFreespace(Space freespace, Box used, Placement target) {
-
         // Two free spaces, on each rotation of the used space.
         // Height is always the same, used box is assumed within free space height.
         // First:
@@ -246,24 +218,7 @@ public class Packager {
         return false;
     }
 
-
-    protected Adapter adapter(List<Box> boxes) {
-        // instead of placing boxes, work with placements
-        // this very much reduces the number of objects created
-        // performance gain is something like 25% over the box-centric approach
-
-        PermutationBoxIterator permutationIterator = new PermutationBoxIterator(boxes);
-        final List<Placement> placements = getPlacements(permutationIterator.getLength());
-
-        return new Adapter() {
-            @Override
-            public Container pack(List<Box> boxes, Dimension dimension, long deadline) {
-                return Packager.this.pack(placements, dimension, permutationIterator, deadline);
-            }
-        };
-    }
-
-    protected boolean canHold(Dimension containerBox, List<Box> boxes) {
+    private boolean canHold(Dimension containerBox, List<Box> boxes) {
         for (Box box : boxes) {
             if (!containerBox.canHold2D(box)) {
                 return false;
@@ -272,7 +227,7 @@ public class Packager {
         return true;
     }
 
-    public static List<Placement> getPlacements(int size) {
+    private static List<Placement> getPlacements(int size) {
         // each box will at most have a single placement with a space (and its remainder).
         List<Placement> placements = new ArrayList<>(size);
 
@@ -287,14 +242,15 @@ public class Packager {
         return placements;
     }
 
-    public Container pack(List<Box> boxes, Dimension dimension, long deadline) {
+    private Container pack(List<Box> boxes, Dimension dimension) {
         if (dimension == null) {
             return null;
         }
 
-        Adapter pack = adapter(boxes);
+        PermutationBoxIterator permutationIterator = new PermutationBoxIterator(boxes);
+        final List<Placement> placements = getPlacements(permutationIterator.getLength());
 
-        Container result = pack.pack(boxes, dimension, deadline);
+        Container result = this.pack(placements, dimension, permutationIterator);
         if (result != null) {
             return result;
         }
@@ -309,11 +265,11 @@ public class Packager {
         private List<Box> nextPermutation;
         int permutationLength = 1;
 
-        public int getLength() {
-           return permutationLength;
+        private int getLength() {
+           return permutationLength -1;
         }
 
-        public boolean isWithinHeight(int fromIndex, int height) {
+        private boolean isWithinHeight(int fromIndex, int height) {
             for (int i = (fromIndex + 1); i < getLength(); i++) {
                 if (objectMap.get(i).getHeight() > height) {
                     return false;
@@ -322,7 +278,7 @@ public class Packager {
             return true;
         }
 
-        public Box get(Integer index) {
+        protected Box get(Integer index) {
             return this.objectMap.get(index);
         }
 
@@ -334,14 +290,14 @@ public class Packager {
                 this.direction = new boolean[coll.size()];
                 Arrays.fill(this.direction, false);
 
-                this.objectMap = new HashMap();
+                this.objectMap = new HashMap<>();
 
                 for(Iterator it = coll.iterator(); it.hasNext(); this.keys[permutationLength - 1] = permutationLength++) {
                     Box e = (Box) it.next();
                     this.objectMap.put(permutationLength, e);
                 }
 
-                this.nextPermutation = new ArrayList(coll);
+                this.nextPermutation = new ArrayList<>(coll);
             }
         }
 

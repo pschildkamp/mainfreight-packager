@@ -5,6 +5,8 @@ import com.google.gson.reflect.TypeToken;
 import packing.*;
 import packing.Box;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -13,7 +15,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,14 +29,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class Controller implements PropertyChangeListener {
     private View view;
     private Model model;
-    private Stopwatch stopwatch;
 
     public Controller(View view, Model model) {
         this.view = view;
         this.model = model;
         this.model.addListener(this);
-
-        this.stopwatch = new Stopwatch();
 
         setUpViewEvents();
     }
@@ -41,245 +43,40 @@ public class Controller implements PropertyChangeListener {
         view.getTimeOutComboBox().setModel(Model.getTimeOuts());
         view.getBoxesTable().setModel(model.getBoxes());
 
-        view.getAddBoxBtn().addActionListener(actionEvent -> {
-            if (actionEvent.getActionCommand().equals("addBox")) {
-                model.getBoxes().addRow(new Object[] { "Nieuwe box", 5, 5, 5 });
-                /** When no boxes added */
+        view.getAddBoxBtn().addActionListener(new AddBoxActionListener());
+        view.getPackBtn().addActionListener(new PackageActionListener());
+        view.getRemoveBoxBtn().addActionListener(new RemoveBoxActionListener());
+    }
 
-            }
-        });
+    public void showInfoMessage(String message) {
+        showModal(message, JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        view.getPackBtn().addActionListener(e -> {
-            try {
-                if (model.getBoxes().getRowCount() < 1)
-                    throw new RuntimeException("Je moet minimaal 1 doos toevoegen");
+    public void showErrorMessage(String message) {
+        showModal(message, JOptionPane.ERROR_MESSAGE);
+    }
 
-                Packager packager = new Packager((Dimension) view.getContainerComboBox().getSelectedItem());
-                Integer chosenTimeout = 10; //Default 10 seconds timeout.
-                chosenTimeout = (Integer) view.getTimeOutComboBox().getSelectedItem();
+    public void showWarningMessage(String message) {
+        showModal(message, JOptionPane.WARNING_MESSAGE);
+    }
 
-                List<Box> products = new ArrayList<>();
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
-                products.add(new Box("74760_2",30,20,15));
-                products.add(new Box("74757",30,40,15));
-                products.add(new Box("74808",100,120,75));
-                products.add(new Box("73770",20,30,15));
-                products.add(new Box("74844_1",60,40,28));
-                products.add(new Box("74844_2",60,40,28));
-                products.add(new Box("74844_3",60,40,28));
-                products.add(new Box("74846",30,40,15));
-                products.add(new Box("73767_1",60,50,15));
-                products.add(new Box("73767_2",60,50,15));
-                products.add(new Box("74848",20,30,15));
-                products.add(new Box("74850",20,30,15));
-                products.add(new Box("74852",20,30,15));
-                products.add(new Box("72407",20,30,15));
-                products.add(new Box("74809",100,120,52));
-                products.add(new Box("71535",30,40,15));
-                products.add(new Box("74780",20,30,15));
-                products.add(new Box("74760_1",30,20,15));
+    public void showModal(final String message, final int type) {
+        String modalTitle;
+        switch(type) {
+            case JOptionPane.WARNING_MESSAGE:
+                modalTitle = "Waarschuwing";
+                break;
+            case JOptionPane.ERROR_MESSAGE:
+                modalTitle = "Error";
+                break;
+            default:
+                modalTitle = "Informatie";
+        }
 
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Json files", "json");
-
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileFilter(filter);
-
-                if (fileChooser.showSaveDialog(view.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    long deadline = System.currentTimeMillis() + (chosenTimeout * 1000); //to seconds
-                    Container match = null;
-//                    AtomicInteger atomicTimeout = new AtomicInteger(chosenTimeout);
-//
-//                    stopwatch.start(() -> {
-//                        System.out.println("LAMBDA");
-//                        Integer remainingTimeout = atomicTimeout.getAndDecrement();
-//                        this.view.getTimeoutCounter().setText(String.format("Resterende tijd: %d", remainingTimeout));
-//                        this.view.repaint();
-//                    });
-
-                    final ExecutorService executor = Executors.newSingleThreadExecutor();
-                    Future<Container> future = executor.submit(() -> packager.pack(products, deadline));
-
-                    try {
-                        match = future.get();
-                    } catch(ContainerTooSmallException ctse) {
-                        JOptionPane.showMessageDialog(view.getFrame(),
-                                ctse.getMessage(),
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } catch(InterruptedException | ExecutionException futureException) {
-                        throw new RuntimeException(futureException);
-                    } finally {
-                        executor.shutdownNow();
-                    }
-
-                    if(match == null) {
-                        JOptionPane.showMessageDialog(view.getFrame(),
-                                "Geen doos pas in deze container",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        GsonBuilder gsonBuilder = new GsonBuilder();
-                        gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
-                        Gson gson = gsonBuilder.create();
-                        Type type = new TypeToken<Container>() {}.getType();
-
-                        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-                            writer.write(gson.toJson(match, type));
-                            int totalAmountOfPackedBoxes = 0;
-                            for(Level level : match.getLevels()) {
-                                totalAmountOfPackedBoxes += level.getTotalAmountOfBoxes();
-                            }
-                            JOptionPane.showMessageDialog(view.getFrame(), "Inpak bestand " + file.getName() + " succesvol gevuld met " + totalAmountOfPackedBoxes + " dozen.", "Succes", JOptionPane.INFORMATION_MESSAGE);
-                        }  catch (IOException ioException) {
-                            JOptionPane.showMessageDialog(view.getFrame(),
-                                    "Opslaan mislukt, probeer het opnieuw.",
-                                    "Error",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
-            } catch(RuntimeException ex) {
-                JOptionPane.showMessageDialog(view.getFrame(),
-                        ex.getMessage(),
-                        "Waarschuwing",
-                        JOptionPane.WARNING_MESSAGE);
-            } finally {
-                this.stopwatch.stop();
-            }
-        });
-
-        view.getRemoveBoxBtn().addActionListener(e -> {
-            System.out.println(e);
-        });
-
+        JOptionPane.showMessageDialog(view.getFrame(),
+                message,
+                modalTitle,
+                type);
     }
 
     @Override
@@ -287,15 +84,79 @@ public class Controller implements PropertyChangeListener {
 
     }
 
-    public class Stopwatch {
-        private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private class PackageActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (model.getBoxes().getRowCount() < 1) {
+                showInfoMessage("Je moet minimaal 1 doos toevoegen"); return;
+            }
 
-        public void start(Runnable task) {
-            executor.scheduleWithFixedDelay(task, 0L, 1L, TimeUnit.SECONDS);
+            Packager packager = new Packager((Dimension) view.getContainerComboBox().getSelectedItem());
+            Long chosenTimeout = (Long) view.getTimeOutComboBox().getSelectedItem();
+
+            final Enumeration productsVector = model.getBoxes().getDataVector().elements();
+            final ArrayList<Box> products = new ArrayList<>();
+
+            while(productsVector.hasMoreElements()) {
+                Vector productVector = (Vector) productsVector.nextElement();
+                products.add(new Box((String) productVector.get(0), (int) productVector.get(2),  (int) productVector.get(3),  (int) productVector.get(1)));
+            }
+
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Json files", "json");
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(filter);
+
+            if (fileChooser.showSaveDialog(view.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+
+                CompletableFuture<Container> findMatch = CompletableFuture.supplyAsync(() -> packager.pack(products))
+                        .whenComplete((container, throwable) -> {
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
+                            Gson gson = gsonBuilder.create();
+                            Type type = new TypeToken<Container>() {}.getType();
+
+                            try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
+                                writer.write(gson.toJson(container, type));
+                            }  catch (IOException ioException) {
+                                throw new CompletionException(ioException);
+                            }
+                        });
+
+                try {
+                    Container future = findMatch.get(chosenTimeout, TimeUnit.SECONDS);
+                    int totalAmountOfPackedBoxes = 0;
+                    for(Level level : future.getLevels()) {
+                        totalAmountOfPackedBoxes += level.getTotalAmountOfBoxes();
+                    }
+                    showInfoMessage("Succesvol " + totalAmountOfPackedBoxes + " dozen ingepakt.");
+                } catch (InterruptedException | ExecutionException futureException) {
+                    showErrorMessage("Posities bepalen van dozen is mislukt.");
+                } catch (TimeoutException timeoutException) {
+                    showWarningMessage("Helaas heeft het systeem niet binnen de gestelde deadline de dozen kunnen inpakken.");
+                }
+            }
         }
+    }
 
-        public void stop() {
-            executor.shutdownNow();
+    private class RemoveBoxActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (int selectedRow : view.getBoxesTable().getSelectedRows()) {
+                model.getBoxes().removeRow(selectedRow);
+            }
+
+            view.getBoxesTable().clearSelection();
+        }
+    }
+
+    private class AddBoxActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getActionCommand().equals("addBox")) {
+                model.getBoxes().addRow(new Object[] { "Nieuwe box", ((int) Math.floor(Math.random() * 100) + 1),  ((int) Math.floor(Math.random() * 100) + 1),  ((int) Math.floor(Math.random() * 100) + 1) });
+            }
         }
     }
 
