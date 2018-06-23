@@ -1,15 +1,15 @@
 package packing;
 
 /**
- * Placement as in box in a space.
+ * Placement as in item in a space.
  * 
- * The box does not necessarily fill the whole space.
+ * The item does not necessarily fill the whole space.
  */
 
 public class Placement {
 
     public transient Space space;
-    public transient Box box;
+    public transient Item item;
 
     public Placement(Space space) {
         this.space = space;
@@ -19,11 +19,11 @@ public class Placement {
         return space;
     }
 
-    public Box getBox() {
-        return box;
+    public Item getItem() {
+        return item;
     }
 
-    public void setBox(Box box) {
-        this.box = box;
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

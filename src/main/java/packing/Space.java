@@ -2,12 +2,12 @@ package packing;
 
 public class Space extends Dimension {
 
-    public transient Space parent;
-    public transient Space remainder;
+    private transient Space parent;
+    private transient Space remainder;
 
-    public int x; // width
-    public int y; // depth
-    public int z; // height
+    protected int x;
+    protected int y;
+    protected int z;
 
     public Space() {
         super();
@@ -37,46 +37,6 @@ public class Space extends Dimension {
         return remainder;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-        result = prime * result + ((remainder == null) ? 0 : remainder.hashCode());
-        result = prime * result + x;
-        result = prime * result + y;
-        result = prime * result + z;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Space other = (Space) obj;
-        if (parent == null) {
-            if (other.parent != null)
-                return false;
-        } else if (!parent.equals(other.parent))
-            return false;
-        if (remainder == null) {
-            if (other.remainder != null)
-                return false;
-        } else if (!remainder.equals(other.remainder))
-            return false;
-        if (x != other.x)
-            return false;
-        if (y != other.y)
-            return false;
-        if (z != other.z)
-            return false;
-        return true;
-    }
-
     public void copyFrom(Space space) {
         parent = space.parent;
         x = space.x;
@@ -93,9 +53,9 @@ public class Space extends Dimension {
         this.y = y;
         this.z = z;
 
-        this.width = w;
-        this.depth = d;
-        this.height = h;
+        width = w;
+        depth = d;
+        height = h;
     }
 
 }

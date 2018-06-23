@@ -7,7 +7,6 @@ import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.table.DefaultTableModel;
 
 import java.beans.PropertyChangeListener;
-import java.util.List;
 
 public class Model {
 

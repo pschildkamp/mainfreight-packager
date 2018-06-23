@@ -15,16 +15,16 @@ public class Level extends ArrayList<Placement> {
         int height = 0;
 
         for (Placement placement : this) {
-            Box box = placement.getBox();
-            if (box.getHeight() > height) {
-                height = box.getHeight();
+            Item item = placement.getItem();
+            if (item.getHeight() > height) {
+                height = item.getHeight();
             }
         }
 
         return height;
     }
 
-    public int getTotalAmountOfBoxes()  {
-        return this.size();
+    public int getTotalAmountOfBoxes() {
+        return size();
     }
 }

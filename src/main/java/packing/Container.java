@@ -3,7 +3,7 @@ package packing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container extends Box {
+public class Container extends Item {
 
     private int stackHeight = 0;
 
@@ -33,11 +33,13 @@ public class Container extends Box {
         if (levels.isEmpty()) {
             return 0;
         }
-        return levels.get(levels.size() - 1).getHeight();
+        return levels.get(levels.size() - 1)
+                .getHeight();
     }
 
     public void add(Placement placement) {
-        levels.get(levels.size() - 1).add(placement);
+        levels.get(levels.size() - 1)
+                .add(placement);
     }
 
     public void addLevel() {
