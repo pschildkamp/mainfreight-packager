@@ -1,9 +1,9 @@
-package packing;
+package nl.pepijnschildkamp.packer.packing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container extends Item {
+public class Wave extends Item {
 
     private int stackHeight = 0;
 
@@ -13,7 +13,7 @@ public class Container extends Item {
 
     private List<Level> levels = new ArrayList<>();
 
-    public Container(Dimension dimension) {
+    public Wave(Dimension dimension) {
         super(dimension.getName(), dimension.getWidth(), dimension.getDepth(), dimension.getHeight());
     }
 
@@ -76,7 +76,7 @@ public class Container extends Item {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Container other = (Container) obj;
+        Wave other = (Wave) obj;
         if (levels == null) {
             if (other.levels != null)
                 return false;

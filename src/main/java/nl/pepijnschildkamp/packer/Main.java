@@ -1,6 +1,8 @@
-import mvc.Controller;
-import mvc.Model;
-import mvc.View;
+package nl.pepijnschildkamp.packer;
+
+import nl.pepijnschildkamp.packer.mvc.Controller;
+import nl.pepijnschildkamp.packer.mvc.Model;
+import nl.pepijnschildkamp.packer.mvc.View;
 
 import javax.swing.*;
 

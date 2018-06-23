@@ -1,4 +1,4 @@
-package packing;
+package nl.pepijnschildkamp.packer.packing;
 
 import java.util.ArrayList;
 

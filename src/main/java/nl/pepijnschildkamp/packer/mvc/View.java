@@ -1,8 +1,9 @@
-package mvc;
+package nl.pepijnschildkamp.packer.mvc;
 
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 import static java.awt.Component.LEFT_ALIGNMENT;
 import static javax.swing.BoxLayout.PAGE_AXIS;
@@ -10,13 +11,12 @@ import static javax.swing.BoxLayout.PAGE_AXIS;
 public class View {
 
     private JFrame frame;
-    private JComboBox containerComboBox;
+    private JComboBox waveComboBox;
     private JComboBox timeOutComboBox;
     private JButton addRowButton;
     private JButton removeRowButton;
     private JButton packButton;
     private JTable boxesTable;
-    private JLabel permutationBoxIteratorCounter;
 
     public View() {
         frame = new JFrame("Mainfreight - Packing optimalisator");
@@ -27,6 +27,7 @@ public class View {
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setResizable(false);
 
         /* Add header */
         mainPanel.add(getHeaderPanel());
@@ -52,13 +53,13 @@ public class View {
         packingOptionsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         packingOptionsPanel.setPreferredSize(new Dimension(370, 500));
 
-        containerComboBox = new JComboBox();
+        waveComboBox = new JComboBox();
         JLabel containerLabel = new JLabel("Kies container");
-        containerLabel.setLabelFor(containerComboBox);
-        containerComboBox.setPreferredSize(new Dimension(370, 25));
+        containerLabel.setLabelFor(waveComboBox);
+        waveComboBox.setPreferredSize(new Dimension(370, 25));
 
         packingOptionsPanel.add(containerLabel);
-        packingOptionsPanel.add(containerComboBox);
+        packingOptionsPanel.add(waveComboBox);
 
         timeOutComboBox = new JComboBox();
         JLabel timeOutLabel = new JLabel("Kies maximale calculatie tijd in seconden");
@@ -76,13 +77,6 @@ public class View {
 
         packingOptionsPanel.add(packButton);
 
-        packingOptionsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-
-        permutationBoxIteratorCounter = new JLabel("Doos posities geprobeerd: 0");
-        packingOptionsPanel.add(permutationBoxIteratorCounter);
-
-        packingOptionsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-
         return packingOptionsPanel;
     }
 
@@ -95,7 +89,6 @@ public class View {
         JLabel label = new JLabel(mainFreightLogo);
         label.setPreferredSize(new Dimension(780, 30));
         panel.add(label);
-        panel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, new Color(0,0,0)));
 
         return panel;
     }
@@ -108,12 +101,13 @@ public class View {
         addRowButton.setVerticalTextPosition(SwingConstants.CENTER);
         addRowButton.setActionCommand("addBox");
         addRowButton.setToolTipText("Voeg nieuwe doos toe");
+        addRowButton.setSize(new Dimension(380, 20));
 
         removeRowButton = new JButton("Verwijder geselecteerde doos");
         removeRowButton.setVerticalTextPosition(SwingConstants.CENTER);
         removeRowButton.setActionCommand("removeBox");
         removeRowButton.setToolTipText("Verwijder geselecteerde doos");
-        removeRowButton.setPreferredSize(new Dimension(380, 20));
+        removeRowButton.setSize(new Dimension(380, 20));
 
         JLabel boxesLabel = new JLabel("Te berekenen pakketten");
         boxesLabel.setLabelFor(boxesTable);
@@ -125,24 +119,26 @@ public class View {
 
         JPanel listPane = new JPanel();
         listPane.setLayout(new BoxLayout(listPane, PAGE_AXIS));
+        listPane.setBorder(new LineBorder(new Color(0,0,0), 1));
         listPane.add(boxesLabel);
         listPane.add(Box.createRigidArea(new Dimension(0,5)));
         listPane.add(listScroller);
         listPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
-//        JPanel boxActionPanel = new JPanel(new ());
-//       boxActionPanel.setLayout(new BoxLayout(boxActionPanel, BoxLayout.LINE_AXIS));
-        listPane.add(removeRowButton);
-        listPane.add(addRowButton);
+        JPanel boxActionPanel = new JPanel();
+        boxActionPanel.setBorder(new LineBorder(new Color(0,0,0), 1));
+        boxActionPanel.setLayout(new BoxLayout(boxActionPanel, BoxLayout.PAGE_AXIS));
+        boxActionPanel.add(removeRowButton);
+        boxActionPanel.add(addRowButton);
 
-//        listPane.add(boxActionPanel);
+        listPane.add(boxActionPanel);
         listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         return listPane;
     }
 
-    public JComboBox getContainerComboBox() {
-        return containerComboBox;
+    public JComboBox getWaveComboBox() {
+        return waveComboBox;
     }
 
     public JComboBox getTimeOutComboBox() {

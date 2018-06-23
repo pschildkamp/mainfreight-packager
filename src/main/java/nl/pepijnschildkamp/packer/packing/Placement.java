@@ -1,4 +1,4 @@
-package packing;
+package nl.pepijnschildkamp.packer.packing;
 
 /**
  * Placement as in item in a space.

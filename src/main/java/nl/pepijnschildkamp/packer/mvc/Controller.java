@@ -1,5 +1,21 @@
-package mvc;
+package nl.pepijnschildkamp.packer.mvc;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
+import nl.pepijnschildkamp.packer.packing.Dimension;
+import nl.pepijnschildkamp.packer.packing.Item;
+import nl.pepijnschildkamp.packer.packing.Level;
+import nl.pepijnschildkamp.packer.packing.Packager;
+import nl.pepijnschildkamp.packer.packing.Placement;
+import nl.pepijnschildkamp.packer.packing.Wave;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -19,24 +35,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
-
-import packing.Container;
-import packing.Dimension;
-import packing.Item;
-import packing.Level;
-import packing.Packager;
-import packing.Placement;
-
 public class Controller implements PropertyChangeListener {
     private View view;
     private Model model;
@@ -50,8 +48,8 @@ public class Controller implements PropertyChangeListener {
     }
 
     private void setUpViewEvents() {
-        view.getContainerComboBox()
-                .setModel(Model.getAvailablePackingContainers());
+        view.getWaveComboBox()
+                .setModel(Model.getAvailablePackingWaves());
         view.getTimeOutComboBox()
                 .setModel(Model.getTimeOuts());
         view.getBoxesTable()
@@ -80,14 +78,14 @@ public class Controller implements PropertyChangeListener {
     public void showModal(final String message, final int type) {
         String modalTitle;
         switch (type) {
-        case JOptionPane.WARNING_MESSAGE:
-            modalTitle = "Waarschuwing";
-            break;
-        case JOptionPane.ERROR_MESSAGE:
-            modalTitle = "Error";
-            break;
-        default:
-            modalTitle = "Informatie";
+            case JOptionPane.WARNING_MESSAGE:
+                modalTitle = "Waarschuwing";
+                break;
+            case JOptionPane.ERROR_MESSAGE:
+                modalTitle = "Error";
+                break;
+            default:
+                modalTitle = "Informatie";
         }
 
         JOptionPane.showMessageDialog(view.getFrame(), message, modalTitle, type);
@@ -107,7 +105,7 @@ public class Controller implements PropertyChangeListener {
                 return;
             }
 
-            Packager packager = new Packager((Dimension) view.getContainerComboBox()
+            Packager packager = new Packager((Dimension) view.getWaveComboBox()
                     .getSelectedItem());
             Long chosenTimeout = Long.valueOf((Integer) Objects.requireNonNull(view.getTimeOutComboBox()
                     .getSelectedItem()));
@@ -130,25 +128,25 @@ public class Controller implements PropertyChangeListener {
             if (fileChooser.showSaveDialog(view.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
 
-                CompletableFuture<Container> findMatch = CompletableFuture.supplyAsync(() -> packager.pack(products))
-                        .whenComplete((container, throwable) -> {
+                CompletableFuture<Wave> findMatch = CompletableFuture.supplyAsync(() -> packager.pack(products))
+                        .whenComplete((Wave, throwable) -> {
                             GsonBuilder gsonBuilder = new GsonBuilder();
                             gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
                             Gson gson = gsonBuilder.create();
-                            Type type = new TypeToken<Container>() {
+                            Type type = new TypeToken<Wave>() {
                             }.getType();
 
                             try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-                                writer.write(gson.toJson(container, type));
+                                writer.write(gson.toJson(Wave, type));
                             } catch (IOException ioException) {
                                 throw new CompletionException(ioException);
                             }
                         });
 
                 try {
-                    Container future = findMatch.get(chosenTimeout, TimeUnit.SECONDS);
+                    Wave future = findMatch.get(chosenTimeout, TimeUnit.SECONDS);
                     int totalAmountOfPackedBoxes = 0;
-                    for (Level level : future.getLevels()) {
+                    for (Level level: future.getLevels()) {
                         totalAmountOfPackedBoxes += level.getTotalAmountOfBoxes();
                     }
                     showInfoMessage("Succesvol " + totalAmountOfPackedBoxes + " dozen ingepakt.");
@@ -164,7 +162,7 @@ public class Controller implements PropertyChangeListener {
     private class RemoveBoxActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (int selectedRow : view.getBoxesTable()
+            for (int selectedRow: view.getBoxesTable()
                     .getSelectedRows()) {
                 model.getBoxes()
                         .removeRow(selectedRow);
@@ -184,8 +182,8 @@ public class Controller implements PropertyChangeListener {
                 if (e.getActionCommand()
                         .equals("addBox")) {
                     model.getBoxes()
-                            .addRow(new Object[] { "Nieuwe item", ((int) Math.floor(Math.random() * 100) + 1), ((int) Math.floor(Math.random() * 100) + 1),
-                                    ((int) Math.floor(Math.random() * 100) + 1) });
+                            .addRow(new Object[]{"Nieuwe item", ((int) Math.floor(Math.random() * 100) + 1), ((int) Math.floor(Math.random() * 100) + 1),
+                                    ((int) Math.floor(Math.random() * 100) + 1)});
                 }
             } else {
                 showWarningMessage("Maximaal aantal dozen (" + MAX_BOXES + ") bereikt. Applicatie ondersteunt niet meer dozen.");

@@ -1,7 +1,8 @@
-package packing;
+package nl.pepijnschildkamp.packer.packing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,61 +11,61 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * Fit boxes into container, i.e. perform bin packing to a single container. <br>
+ * Fit boxes into Wave, i.e. perform bin packing to a single Wave. <br>
  * <br>
  * This attempts a brute force approach, which is very demanding in terms of resources. For use in scenarios with 'few'
- * boxes, where the complexity of a 'few' can be measured for a specific set of boxes and containers using <br>
+ * boxes, where the complexity of a 'few' can be measured for a specific set of boxes and Waves using <br>
  * Thread-safe implementation.
  */
 
 public class Packager {
 
-    private final Dimension container;
+    private final Dimension Wave;
 
-    public Packager(Dimension container) {
-        this.container = container;
+    public Packager(Dimension Wave) {
+        this.Wave = Wave;
     }
 
-    public Dimension filterContainer(List<Item> items) {
+    public Dimension filterWave(List<Item> items) {
         long volume = 0;
         for (Item item : items) {
             volume += item.getVolume();
         }
 
-        if (container.getVolume() < volume) {
-            throw new ContainerTooSmallException(
-                    "Container (volume: " + container.getVolume() + " is te klein voor al deze dozen (totaal volume: " + volume + ")");
+        if (Wave.getVolume() < volume) {
+            throw new WaveTooSmallException(
+                    "Wave (volume: " + Wave.getVolume() + " is te klein voor al deze dozen (totaal volume: " + volume + ")");
         }
 
-        if (!canHold(container, items)) {
-            throw new ContainerTooSmallException("Container is te klein voor ingevoerde (enkele) dozen.");
+        if (!canHold(Wave, items)) {
+            throw new WaveTooSmallException("Wave is te klein voor ingevoerde (enkele) dozen.");
         }
 
-        return container;
+        return Wave;
     }
 
     /**
      *
-     * Return a container which holds all the items in the argument
+     * Return a Wave which holds all the items in the argument
      *
      * @param items
-     *            list of items to fit in a container
-     * @return index of container if match, -1 if not
+     *            list of items to fit in a Wave
+     * @return index of Wave if match, -1 if not
      */
 
-    public Container pack(List<Item> items) {
-        return pack(items, filterContainer(items));
+    public Wave pack(List<Item> items) {
+        return pack(items, filterWave(items));
     }
 
-    public Container pack(List<Placement> placements, Dimension container, PermutationBoxIterator rotator) {
+    public Wave pack(List<Placement> placements, Dimension Wave, PermutationBoxIterator rotator) {
 
-        Container holder = new Container(container);
+        Wave holder = new Wave(Wave);
 
         // iterator over all permutations
         do {
             // iterator over all rotations
             for (Item item : rotator.next()) {
-                Dimension remainingSpace = container;
+                Dimension remainingSpace = Wave;
 
                 int index = 0;
                 while (index < rotator.getLength()) {
@@ -76,8 +77,8 @@ public class Packager {
 
                     Placement placement = placements.get(index);
                     Space levelSpace = placement.getSpace();
-                    levelSpace.width = container.getWidth();
-                    levelSpace.depth = container.getDepth();
+                    levelSpace.width = Wave.getWidth();
+                    levelSpace.depth = Wave.getDepth();
                     levelSpace.height = item.getHeight();
 
                     placement.setItem(item);
@@ -107,7 +108,7 @@ public class Packager {
         return null;
     }
 
-    private int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Container holder, Placement usedSpace) {
+    private int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Wave holder, Placement usedSpace) {
         // add used space item now
         // there is up to possible 2 free spaces
         holder.add(usedSpace);
@@ -246,9 +247,9 @@ public class Packager {
         return false;
     }
 
-    private boolean canHold(Dimension containerBox, List<Item> items) {
+    private boolean canHold(Dimension WaveBox, List<Item> items) {
         for (Item item : items) {
-            if (!containerBox.canHold2D(item)) {
+            if (!WaveBox.canHold2D(item)) {
                 return false;
             }
         }
@@ -270,7 +271,7 @@ public class Packager {
         return placements;
     }
 
-    private Container pack(List<Item> items, Dimension dimension) {
+    private Wave pack(List<Item> items, Dimension dimension) {
         if (dimension == null) {
             return null;
         }
@@ -278,7 +279,7 @@ public class Packager {
         PermutationBoxIterator permutationIterator = new PermutationBoxIterator(items);
         final List<Placement> placements = getPlacements(permutationIterator.getLength());
 
-        Container result = pack(placements, dimension, permutationIterator);
+        Wave result = pack(placements, dimension, permutationIterator);
         if (result != null) {
             return result;
         }

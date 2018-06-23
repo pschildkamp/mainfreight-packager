@@ -1,6 +1,6 @@
-package mvc;
+package nl.pepijnschildkamp.packer.mvc;
 
-import packing.Dimension;
+import nl.pepijnschildkamp.packer.packing.Dimension;
 
 import javax.swing.*;
 import javax.swing.event.SwingPropertyChangeSupport;
@@ -10,13 +10,13 @@ import java.beans.PropertyChangeListener;
 
 public class Model {
 
-    protected SwingPropertyChangeSupport propChangeFirer;
+    private SwingPropertyChangeSupport propChangeFirer;
 
-    private static DefaultComboBoxModel<Dimension> AVAILABLE_PACKING_CONTAINERS = new DefaultComboBoxModel<>();
+    private static final DefaultComboBoxModel<Dimension> AVAILABLE_PACKING_WAVES = new DefaultComboBoxModel<>();
 
-    private static DefaultComboBoxModel<Integer> TIME_OUTS = new DefaultComboBoxModel<>();
+    private static final DefaultComboBoxModel<Integer> TIME_OUTS = new DefaultComboBoxModel<>();
 
-    private DefaultTableModel boxes = new DefaultTableModel() {
+    private final DefaultTableModel boxes = new DefaultTableModel() {
         Class[] types = new Class[] { String.class, Integer.class, Integer.class, Integer.class };
         String[] columnNames = new String[] { "Naam", "Hoogte", "Breedte", "Diepte" };
 
@@ -37,9 +37,9 @@ public class Model {
     };
 
     static {
-        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Bestelbus", 2000, 4500, 1900));
-        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vrachtwagen 1tue", 2450, 6000, 2590));
-        AVAILABLE_PACKING_CONTAINERS.addElement(new Dimension("Vrachtwagen 2tue", 2450, 12000, 2590));
+        AVAILABLE_PACKING_WAVES.addElement(new Dimension("Bestelbus", 2000, 4500, 1900));
+        AVAILABLE_PACKING_WAVES.addElement(new Dimension("Vrachtwagen 1tue", 2450, 6000, 2590));
+        AVAILABLE_PACKING_WAVES.addElement(new Dimension("Vrachtwagen 2tue", 2450, 12000, 2590));
 
         TIME_OUTS.addElement(30);
         TIME_OUTS.addElement(60);
@@ -57,8 +57,8 @@ public class Model {
         propChangeFirer.addPropertyChangeListener(prop);
     }
 
-    public static ComboBoxModel getAvailablePackingContainers() {
-        return AVAILABLE_PACKING_CONTAINERS;
+    public static ComboBoxModel getAvailablePackingWaves() {
+        return AVAILABLE_PACKING_WAVES;
     }
 
     public static ComboBoxModel getTimeOuts() {

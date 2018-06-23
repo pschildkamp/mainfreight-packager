@@ -1,4 +1,4 @@
-package packing;
+package nl.pepijnschildkamp.packer.packing;
 
 public class Item extends Dimension implements Cloneable {
 
