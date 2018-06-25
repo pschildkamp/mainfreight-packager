@@ -365,7 +365,7 @@ public class Packager {
                     boolean tmpDirection = direction[indexOfLargestMobileInteger];
                     direction[indexOfLargestMobileInteger] = direction[indexOfLargestMobileInteger + offset];
                     direction[indexOfLargestMobileInteger + offset] = tmpDirection;
-                    List<Item> nextP = new ArrayList();
+                    List<Item> nextP = new ArrayList<>();
 
                     for (int i = 0; i < keys.length; ++i) {
                         if (keys[i] > largestKey) {
