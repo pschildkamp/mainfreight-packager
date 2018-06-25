@@ -1,20 +1,10 @@
 package nl.pepijnschildkamp.packer.mvc;
 
-import lombok.Getter;
-import sun.misc.ClassLoaderUtil;
-
-import java.awt.*;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.net.URL;
 
-@Getter
 public class View {
 
     private JFrame frame;
@@ -157,5 +147,33 @@ public class View {
         panel.add(packButton, constraints);
 
         return panel;
+    }
+
+    public JFrame getFrame() {
+        return this.frame;
+    }
+
+    public JComboBox getWaveComboBox() {
+        return this.waveComboBox;
+    }
+
+    public JComboBox getTimeOutComboBox() {
+        return this.timeOutComboBox;
+    }
+
+    public JButton getAddRowButton() {
+        return this.addRowButton;
+    }
+
+    public JButton getRemoveRowButton() {
+        return this.removeRowButton;
+    }
+
+    public JButton getPackButton() {
+        return this.packButton;
+    }
+
+    public JTable getBoxesTable() {
+        return this.boxesTable;
     }
 }

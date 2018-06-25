@@ -1,13 +1,11 @@
 package nl.pepijnschildkamp.packer.mvc;
 
-import lombok.Getter;
 import nl.pepijnschildkamp.packer.packing.Dimension;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 
-@Getter
 public class Model {
 
     private static final DefaultComboBoxModel<Dimension> AVAILABLE_PACKING_WAVES = new DefaultComboBoxModel<>();
@@ -53,5 +51,9 @@ public class Model {
 
     public static ComboBoxModel getTimeOuts() {
         return TIME_OUTS;
+    }
+
+    public DefaultTableModel getBoxes() {
+        return this.boxes;
     }
 }

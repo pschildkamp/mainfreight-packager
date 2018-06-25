@@ -1,11 +1,8 @@
 package nl.pepijnschildkamp.packer.packing;
 
-import lombok.EqualsAndHashCode;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode
 public class Wave extends Item {
 
     private int stackHeight = 0;
@@ -60,5 +57,30 @@ public class Wave extends Item {
     public void clear() {
         levels.clear();
         stackHeight = 0;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Wave)) return false;
+        final Wave other = (Wave) o;
+        if (!other.canEqual((Object) this)) return false;
+        if (this.getStackHeight() != other.getStackHeight()) return false;
+        final Object this$levels = this.getLevels();
+        final Object other$levels = other.getLevels();
+        if (this$levels == null ? other$levels != null : !this$levels.equals(other$levels)) return false;
+        return true;
+    }
+
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        result = result * PRIME + this.getStackHeight();
+        final Object $levels = this.getLevels();
+        result = result * PRIME + ($levels == null ? 43 : $levels.hashCode());
+        return result;
+    }
+
+    protected boolean canEqual(Object other) {
+        return other instanceof Wave;
     }
 }
