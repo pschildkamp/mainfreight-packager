@@ -1,5 +1,10 @@
 package nl.pepijnschildkamp.packer.packing;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Space extends Dimension {
 
     private transient Space parent;
@@ -11,30 +16,6 @@ public class Space extends Dimension {
 
     public Space() {
         super();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setParent(Space parent) {
-        this.parent = parent;
-    }
-
-    public void setRemainder(Space dual) {
-        remainder = dual;
-    }
-
-    public Space getRemainder() {
-        return remainder;
     }
 
     public void copyFrom(Space space) {
@@ -57,5 +38,4 @@ public class Space extends Dimension {
         depth = d;
         height = h;
     }
-
 }

@@ -35,14 +35,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class Controller implements PropertyChangeListener {
+public class Controller {
     private View view;
     private Model model;
 
     public Controller(View view, Model model) {
         this.view = view;
         this.model = model;
-        this.model.addListener(this);
 
         setUpViewEvents();
     }
@@ -55,11 +54,11 @@ public class Controller implements PropertyChangeListener {
         view.getBoxesTable()
                 .setModel(model.getBoxes());
 
-        view.getAddBoxBtn()
+        view.getAddRowButton()
                 .addActionListener(new AddBoxActionListener());
-        view.getPackBtn()
+        view.getPackButton()
                 .addActionListener(new PackageActionListener());
-        view.getRemoveBoxBtn()
+        view.getRemoveRowButton()
                 .addActionListener(new RemoveBoxActionListener());
     }
 
@@ -89,11 +88,6 @@ public class Controller implements PropertyChangeListener {
         }
 
         JOptionPane.showMessageDialog(view.getFrame(), message, modalTitle, type);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
     }
 
     private class PackageActionListener implements ActionListener {

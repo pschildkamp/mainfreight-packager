@@ -1,11 +1,13 @@
 package nl.pepijnschildkamp.packer.mvc;
 
+import lombok.Getter;
+
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
+@Getter
 public class View {
 
     private JFrame frame;
@@ -13,8 +15,8 @@ public class View {
     private JComboBox timeOutComboBox;
     private JButton addRowButton;
     private JButton removeRowButton;
-    private JButton packButton = new JButton("temp");
-    private JTable boxesTable = new JTable(); //temp
+    private JButton packButton;
+    private JTable boxesTable;
 
     public View() {
         frame = createFrame();
@@ -144,33 +146,5 @@ public class View {
         panel.add(packButton, constraints);
 
         return panel;
-    }
-
-    public JComboBox getWaveComboBox() {
-        return waveComboBox;
-    }
-
-    public JComboBox getTimeOutComboBox() {
-        return timeOutComboBox;
-    }
-
-    public JTable getBoxesTable() {
-        return boxesTable;
-    }
-
-    public JButton getAddBoxBtn() {
-        return addRowButton;
-    }
-
-    public JButton getRemoveBoxBtn() {
-        return removeRowButton;
-    }
-
-    public JButton getPackBtn() {
-        return packButton;
-    }
-
-    public JFrame getFrame() {
-        return frame;
     }
 }

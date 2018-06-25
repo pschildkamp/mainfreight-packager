@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * Fit boxes into Wave, i.e. perform bin packing to a single Wave. <br>
+ * Fit boxes into wave, i.e. perform bin packing to a single wave. <br>
  * <br>
  * This attempts a brute force approach, which is very demanding in terms of resources. For use in scenarios with 'few'
  * boxes, where the complexity of a 'few' can be measured for a specific set of boxes and Waves using <br>
@@ -20,10 +20,10 @@ import java.util.NoSuchElementException;
 
 public class Packager {
 
-    private final Dimension Wave;
+    private final Dimension wave;
 
-    public Packager(Dimension Wave) {
-        this.Wave = Wave;
+    public Packager(Dimension wave) {
+        this.wave = wave;
     }
 
     public Dimension filterWave(List<Item> items) {
@@ -32,40 +32,40 @@ public class Packager {
             volume += item.getVolume();
         }
 
-        if (Wave.getVolume() < volume) {
+        if (wave.getVolume() < volume) {
             throw new WaveTooSmallException(
-                    "Wave (volume: " + Wave.getVolume() + " is te klein voor al deze dozen (totaal volume: " + volume + ")");
+                    "Wave (volume: " + wave.getVolume() + " is te klein voor al deze dozen (totaal volume: " + volume + ")");
         }
 
-        if (!canHold(Wave, items)) {
+        if (!canHold(wave, items)) {
             throw new WaveTooSmallException("Wave is te klein voor ingevoerde (enkele) dozen.");
         }
 
-        return Wave;
+        return wave;
     }
 
     /**
      *
-     * Return a Wave which holds all the items in the argument
+     * Return a wave which holds all the items in the argument
      *
      * @param items
-     *            list of items to fit in a Wave
-     * @return index of Wave if match, -1 if not
+     *            list of items to fit in a wave
+     * @return index of wave if match, -1 if not
      */
 
     public Wave pack(List<Item> items) {
         return pack(items, filterWave(items));
     }
 
-    public Wave pack(List<Placement> placements, Dimension Wave, PermutationBoxIterator rotator) {
+    public Wave pack(List<Placement> placements, Dimension wave, PermutationBoxIterator rotator) {
 
-        Wave holder = new Wave(Wave);
+        Wave holder = new Wave(wave);
 
         // iterator over all permutations
         do {
             // iterator over all rotations
             for (Item item : rotator.next()) {
-                Dimension remainingSpace = Wave;
+                Dimension remainingSpace = wave;
 
                 int index = 0;
                 while (index < rotator.getLength()) {
@@ -77,8 +77,8 @@ public class Packager {
 
                     Placement placement = placements.get(index);
                     Space levelSpace = placement.getSpace();
-                    levelSpace.width = Wave.getWidth();
-                    levelSpace.depth = Wave.getDepth();
+                    levelSpace.width = wave.getWidth();
+                    levelSpace.depth = wave.getDepth();
                     levelSpace.height = item.getHeight();
 
                     placement.setItem(item);
@@ -140,7 +140,7 @@ public class Packager {
             if (!remainder.isEmpty()) {
                 Item item = rotator.get(index);
 
-                if (item.fitsInside3D(remainder)) {
+                if (item.fitsInside3D(remainder.getWidth(), remainder.getDepth(), remainder.getHeight())) {
                     Placement placement = placements.get(index);
                     placement.setItem(item);
 
@@ -208,7 +208,7 @@ public class Packager {
                 .fitsInside3D(freespace.getWidth(), freespace.getDepth() - used.getDepth(), freespace.getHeight())) {
             target.getSpace()
                     .copyFrom(freespace.getWidth(), freespace.getDepth() - used.getDepth(), freespace.getHeight(), freespace.getX(),
-                            freespace.getY() + used.depth, freespace.getHeight());
+                            freespace.getY() + used.getDepth(), freespace.getHeight());
             target.getSpace()
                     .getRemainder()
                     .copyFrom(freespace.getWidth() - used.getWidth(), used.getDepth(), freespace.getHeight(), freespace.getX() + used.getWidth(),
@@ -247,9 +247,9 @@ public class Packager {
         return false;
     }
 
-    private boolean canHold(Dimension WaveBox, List<Item> items) {
+    private boolean canHold(Dimension waveBox, List<Item> items) {
         for (Item item : items) {
-            if (!WaveBox.canHold2D(item)) {
+            if (!waveBox.canHold2D(item.getWidth(), item.getDepth(), item.getHeight())) {
                 return false;
             }
         }

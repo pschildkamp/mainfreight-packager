@@ -1,16 +1,14 @@
 package nl.pepijnschildkamp.packer.mvc;
 
+import lombok.Getter;
 import nl.pepijnschildkamp.packer.packing.Dimension;
 
 import javax.swing.*;
-import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.table.DefaultTableModel;
 
-import java.beans.PropertyChangeListener;
 
+@Getter
 public class Model {
-
-    private SwingPropertyChangeSupport propChangeFirer;
 
     private static final DefaultComboBoxModel<Dimension> AVAILABLE_PACKING_WAVES = new DefaultComboBoxModel<>();
 
@@ -49,23 +47,11 @@ public class Model {
         TIME_OUTS.addElement(600);
     }
 
-    public Model() {
-        propChangeFirer = new SwingPropertyChangeSupport(this);
-    }
-
-    public void addListener(PropertyChangeListener prop) {
-        propChangeFirer.addPropertyChangeListener(prop);
-    }
-
     public static ComboBoxModel getAvailablePackingWaves() {
         return AVAILABLE_PACKING_WAVES;
     }
 
     public static ComboBoxModel getTimeOuts() {
         return TIME_OUTS;
-    }
-
-    public DefaultTableModel getBoxes() {
-        return boxes;
     }
 }
