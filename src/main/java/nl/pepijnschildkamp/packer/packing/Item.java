@@ -6,7 +6,6 @@ public class Item extends Dimension implements Cloneable {
         super(name, w, d, h);
     }
 
-    @Override
     protected Item clone() {
         return new Item(name, width, depth, height);
     }

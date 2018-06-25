@@ -1,8 +1,15 @@
 package nl.pepijnschildkamp.packer.mvc;
 
 import lombok.Getter;
+import sun.misc.ClassLoaderUtil;
 
 import java.awt.*;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -88,10 +95,14 @@ public class View {
         constraints.anchor = GridBagConstraints.PAGE_START;
         constraints.insets = new Insets(0,0,0,0);
 
-        ImageIcon mainFreightLogo = new ImageIcon(getClass().getResource("/mainfreight-logo.png").getPath());
-        JLabel label = new JLabel(mainFreightLogo);
+        ClassLoader classLoader = View.class.getClassLoader();
+        URL mainFreightLogoResource = classLoader.getResource("mainfreight-logo.png");
 
-        panel.add(label, constraints);
+        if(mainFreightLogoResource != null) {
+            ImageIcon mainFreightLogo = new ImageIcon(mainFreightLogoResource);
+            JLabel label = new JLabel(mainFreightLogo);
+            panel.add(label, constraints);
+        }
 
         return panel;
     }

@@ -10,4 +10,12 @@ public class PackagerTest {
     public void pack() {
         Assertions.assertThat(1).isEqualTo(1);
     }
+
+    //filterWave
+    // Check of exceptie word gegooid
+    // check of allemaal worden terug gegeven
+
+    //isFreespace
+
+
 }

@@ -123,7 +123,7 @@ public class Controller {
                 File file = fileChooser.getSelectedFile();
 
                 CompletableFuture<Wave> findMatch = CompletableFuture.supplyAsync(() -> packager.pack(products))
-                        .whenComplete((Wave, throwable) -> {
+                        .whenComplete((wave, throwable) -> {
                             GsonBuilder gsonBuilder = new GsonBuilder();
                             gsonBuilder.registerTypeAdapter(Placement.class, new PlacementSerializer());
                             Gson gson = gsonBuilder.create();
@@ -131,7 +131,7 @@ public class Controller {
                             }.getType();
 
                             try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-                                writer.write(gson.toJson(Wave, type));
+                                writer.write(gson.toJson(wave, type));
                             } catch (IOException ioException) {
                                 throw new CompletionException(ioException);
                             }
