@@ -10,14 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-/**
- * Fit boxes into wave, i.e. perform bin packing to a single wave. <br>
- * <br>
- * This attempts a brute force approach, which is very demanding in terms of resources. For use in scenarios with 'few'
- * boxes, where the complexity of a 'few' can be measured for a specific set of boxes and Waves using <br>
- * Thread-safe implementation.
- */
-
 public class Packager {
 
     private final Dimension wave;
@@ -44,26 +36,14 @@ public class Packager {
         return wave;
     }
 
-    /**
-     *
-     * Return a wave which holds all the items in the argument
-     *
-     * @param items
-     *            list of items to fit in a wave
-     * @return index of wave if match, -1 if not
-     */
-
     public Wave pack(List<Item> items) {
         return pack(items, filterWave(items));
     }
 
-    public Wave pack(List<Placement> placements, Dimension wave, PermutationBoxIterator rotator) {
-
+    public Wave pack(List<Placement> placements, Dimension wave, PermutationItemIterator rotator) {
         Wave holder = new Wave(wave);
 
-        // iterator over all permutations
         do {
-            // iterator over all rotations
             for (Item item : rotator.next()) {
                 Dimension remainingSpace = wave;
 
@@ -94,10 +74,8 @@ public class Packager {
                     holder.addLevel();
 
                     index++;
-
                     index = fit2D(rotator, index, placements, holder, placement);
 
-                    // update remaining space
                     remainingSpace = holder.getFreeSpace();
                 }
 
@@ -108,9 +86,7 @@ public class Packager {
         return null;
     }
 
-    private int fit2D(PermutationBoxIterator rotator, int index, List<Placement> placements, Wave holder, Placement usedSpace) {
-        // add used space item now
-        // there is up to possible 2 free spaces
+    private int fit2D(PermutationItemIterator rotator, int index, List<Placement> placements, Wave holder, Placement usedSpace) {
         holder.add(usedSpace);
 
         if (index >= rotator.getLength()) {
@@ -123,17 +99,11 @@ public class Packager {
         nextPlacement.setItem(nextItem);
 
         if (!isFreespace(usedSpace.getSpace(), usedSpace.getItem(), nextPlacement)) {
-            // no additional boxes
-            // just make sure the used space fits in the free space
             return index;
         }
 
         index++;
-        // the correct space dimensions is copied into the next placement
 
-        // attempt to fit in the remaining (usually smaller) space first
-
-        // stack in the 'sibling' space - the space left over between the used item and the selected free space
         if (index < rotator.getLength()) {
             Space remainder = nextPlacement.getSpace()
                     .getRemainder();
@@ -159,44 +129,23 @@ public class Packager {
             }
         }
 
-        // fit the next item in the selected free space
         return fit2D(rotator, index, placements, holder, nextPlacement);
     }
 
     private boolean isFreespace(Space freespace, Item used, Placement target) {
-        // Two free spaces, on each rotation of the used space.
-        // Height is always the same, used item is assumed within free space height.
-        // First:
-        // ........................ ........................ .............
-        // . . . . . .
-        // . . . . . .
-        // . A . . A . . .
-        // . . . . . .
-        // . B . . . . B .
-        // ............ . ........................ . .
-        // . . . . .
-        // . . . . .
-        // ........................ .............
-        //
-        // So there is always a 'big' and a 'small' leftover area (the small is not shown).
         if (freespace.getWidth() >= used.getWidth() && freespace.getDepth() >= used.getDepth()) {
-
-            // if B is empty, then it is sufficient to work with A and the other way around
             int b = (freespace.getWidth() - used.getWidth()) * freespace.getDepth();
             int a = freespace.getWidth() * (freespace.getDepth() - used.getDepth());
 
-            // pick the one with largest footprint.
             if (b >= a) {
                 if (b > 0 && b(freespace, used, target)) {
                     return true;
                 }
-
                 return a > 0 && a(freespace, used, target);
             } else {
                 if (a > 0 && a(freespace, used, target)) {
                     return true;
                 }
-
                 return b > 0 && b(freespace, used, target);
             }
         }
@@ -227,7 +176,6 @@ public class Packager {
     private boolean b(Space freespace, Item used, Placement target) {
         if (target.getItem()
                 .fitsInside3D(freespace.getWidth() - used.getWidth(), freespace.getDepth(), freespace.getHeight())) {
-            // we have a winner
             target.getSpace()
                     .copyFrom(freespace.getWidth() - used.getWidth(), freespace.getDepth(), freespace.getHeight(), freespace.getX() + used.getWidth(),
                             freespace.getY(), freespace.getZ());
@@ -257,7 +205,6 @@ public class Packager {
     }
 
     private static List<Placement> getPlacements(int size) {
-        // each item will at most have a single placement with a space (and its remainder).
         List<Placement> placements = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
@@ -276,7 +223,7 @@ public class Packager {
             return null;
         }
 
-        PermutationBoxIterator permutationIterator = new PermutationBoxIterator(items);
+        PermutationItemIterator permutationIterator = new PermutationItemIterator(items);
         final List<Placement> placements = getPlacements(permutationIterator.getLength());
 
         Wave result = pack(placements, dimension, permutationIterator);
@@ -287,7 +234,7 @@ public class Packager {
         return null;
     }
 
-    private class PermutationBoxIterator implements Iterator<List<Item>> {
+    private class PermutationItemIterator implements Iterator<List<Item>> {
         private int[] keys;
         private Map<Integer, Item> objectMap;
         private boolean[] direction;
@@ -312,7 +259,7 @@ public class Packager {
             return objectMap.get(index);
         }
 
-        public PermutationBoxIterator(Collection<Item> coll) {
+        public PermutationItemIterator(Collection<Item> coll) {
             if (coll == null) {
                 throw new NullPointerException("The collection must not be null");
             } else {
