@@ -22,10 +22,6 @@ public class Placement {
         return this.item;
     }
 
-    public void setSpace(Space space) {
-        this.space = space;
-    }
-
     public void setItem(Item item) {
         this.item = item;
     }

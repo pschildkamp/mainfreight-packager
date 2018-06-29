@@ -139,7 +139,7 @@ public class Controller {
                     Wave future = findMatch.get(chosenTimeout, TimeUnit.SECONDS);
                     int totalAmountOfPackedBoxes = 0;
                     for (Level level: future.getLevels()) {
-                        totalAmountOfPackedBoxes += level.getTotalAmountOfBoxes();
+                        totalAmountOfPackedBoxes += level.getTotalAmountOfItems();
                     }
                     showInfoMessage("Succesvol " + totalAmountOfPackedBoxes + " dozen ingepakt.");
                 } catch (InterruptedException | ExecutionException futureException) {

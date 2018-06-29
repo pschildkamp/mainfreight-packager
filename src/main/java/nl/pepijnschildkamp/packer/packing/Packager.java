@@ -18,20 +18,18 @@ public class Packager {
         this.wave = wave;
     }
 
-    public Dimension filterWave(List<Item> items) {
+    private Dimension filterWave(List<Item> items) {
         long volume = 0;
         for (Item item : items) {
             volume += item.getVolume();
         }
 
-        if (wave.getVolume() < volume) {
+        if (wave.getVolume() < volume)
             throw new WaveTooSmallException(
                     "Wave (volume: " + wave.getVolume() + " is te klein voor al deze dozen (totaal volume: " + volume + ")");
-        }
 
-        if (!canHold(wave, items)) {
+        if (!canHold(wave, items))
             throw new WaveTooSmallException("Wave is te klein voor ingevoerde (enkele) dozen.");
-        }
 
         return wave;
     }
@@ -40,7 +38,7 @@ public class Packager {
         return pack(items, filterWave(items));
     }
 
-    public Wave pack(List<Placement> placements, Dimension wave, PermutationItemIterator rotator) {
+    private Wave pack(List<Placement> placements, Dimension wave, PermutationItemIterator rotator) {
         Wave holder = new Wave(wave);
 
         do {
@@ -50,7 +48,6 @@ public class Packager {
                 int index = 0;
                 while (index < rotator.getLength()) {
                     if (!rotator.isWithinHeight(index, remainingSpace.getHeight())) {
-                        // clean up
                         holder.clear();
                         continue;
                     }
@@ -195,9 +192,9 @@ public class Packager {
         return false;
     }
 
-    private boolean canHold(Dimension waveBox, List<Item> items) {
+    private boolean canHold(Dimension waveItem, List<Item> items) {
         for (Item item : items) {
-            if (!waveBox.canHold2D(item.getWidth(), item.getDepth(), item.getHeight())) {
+            if (!waveItem.canHold2D(item.getWidth(), item.getDepth(), item.getHeight())) {
                 return false;
             }
         }
@@ -239,7 +236,7 @@ public class Packager {
         private Map<Integer, Item> objectMap;
         private boolean[] direction;
         private List<Item> nextPermutation;
-        int permutationLength = 1;
+        private int permutationLength = 1;
 
         private int getLength() {
             return permutationLength - 1;
@@ -259,7 +256,7 @@ public class Packager {
             return objectMap.get(index);
         }
 
-        public PermutationItemIterator(Collection<Item> coll) {
+        protected PermutationItemIterator(Collection<Item> coll) {
             if (coll == null) {
                 throw new NullPointerException("The collection must not be null");
             } else {

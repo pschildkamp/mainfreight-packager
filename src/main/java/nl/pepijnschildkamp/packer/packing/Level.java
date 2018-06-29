@@ -2,14 +2,7 @@ package nl.pepijnschildkamp.packer.packing;
 
 import java.util.ArrayList;
 
-/**
- * A level within a container
- * 
- */
-
 public class Level extends ArrayList<Placement> {
-
-    private static final long serialVersionUID = 1L;
 
     public int getHeight() {
         int height = 0;
@@ -24,7 +17,7 @@ public class Level extends ArrayList<Placement> {
         return height;
     }
 
-    public int getTotalAmountOfBoxes() {
+    public int getTotalAmountOfItems() {
         return size();
     }
 }
